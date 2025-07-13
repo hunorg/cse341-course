@@ -398,3 +398,49 @@ firstMatchTests =
             firstMatch (Constructor ( "Nothing", Unit )) [] == Nothing
     in
     [ test1, test2, test3, test4, test5, test6, test7 ]
+
+
+typecheckPatternsTests : List Bool
+typecheckPatternsTests =
+    let
+        typeEnv =
+            [ ( "Just", "Maybe", IntT )
+            , ( "Nothing", "Maybe", Anything )
+            , ( "Cons", "List", TupleT [ IntT, Datatype "List" ] )
+            , ( "Nil", "List", Anything )
+            ]
+
+        test1 =
+            typecheckPatterns typeEnv [ Variable "x" ] == Just Anything
+
+        test2 =
+            typecheckPatterns typeEnv [ Wildcard ] == Just Anything
+
+        test3 =
+            typecheckPatterns typeEnv [ UnitP ] == Just UnitT
+
+        test4 =
+            typecheckPatterns typeEnv [ ConstP 5 ] == Just IntT
+
+        test5 =
+            typecheckPatterns typeEnv [ TupleP [ Variable "x", Wildcard ] ] == Just (TupleT [ Anything, Anything ])
+
+        test6 =
+            typecheckPatterns typeEnv [ TupleP [ Wildcard, TupleP [ Wildcard, Wildcard ] ] ] == Just (TupleT [ Anything, TupleT [ Anything, Anything ] ])
+
+        test7 =
+            typecheckPatterns typeEnv [ ConstructorP ( "Just", Variable "y" ) ] == Just (Datatype "Maybe")
+
+        test8 =
+            typecheckPatterns typeEnv [ ConstructorP ( "Nothing", Wildcard ) ] == Just (Datatype "Maybe")
+
+        test9 =
+            typecheckPatterns typeEnv [ ConstructorP ( "Cons", TupleP [ Variable "x", Variable "xs" ] ) ] == Just (Datatype "List")
+
+        test10 =
+            typecheckPatterns typeEnv [ ConstructorP ( "Nil", Wildcard ) ] == Just (Datatype "List")
+
+        test11 =
+            typecheckPatterns typeEnv [ UnitP, ConstP 5 ] == Nothing
+    in
+    [ test1, test2, test3, test4, test5, test6, test7, test8, test9, test10, test11 ]

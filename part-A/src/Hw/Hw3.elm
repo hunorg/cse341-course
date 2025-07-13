@@ -1,5 +1,7 @@
 module Hw.Hw3 exposing (..)
 
+import LectureNotes.VariableBindingsAndExpressions exposing (x)
+
 
 type Pattern
     = Wildcard
@@ -260,17 +262,7 @@ match ( v, p ) =
             case v of
                 Tuple vs ->
                     if List.length ps == List.length vs then
-                        let
-                            listPairZip : List a -> List b -> List ( a, b )
-                            listPairZip xs ys =
-                                case ( xs, ys ) of
-                                    ( x :: xs_, y :: ys_ ) ->
-                                        ( x, y ) :: listPairZip xs_ ys_
-
-                                    _ ->
-                                        []
-                        in
-                        allAnswers (\( x, y ) -> match ( x, y )) (listPairZip vs ps)
+                        allAnswers (\( x, y ) -> match ( x, y )) (List.map2 Tuple.pair vs ps)
 
                     else
                         Nothing
@@ -294,3 +286,122 @@ match ( v, p ) =
 firstMatch : Valu -> List Pattern -> Maybe (List ( String, Valu ))
 firstMatch v ps =
     firstAnswer (\p -> match ( v, p )) ps
+
+
+
+-- CHALLENGE PROBLEM:
+
+
+type Typ
+    = Anything
+    | UnitT
+    | IntT
+    | TupleT (List Typ)
+    | Datatype String
+
+
+typecheckPatterns : List ( String, String, Typ ) -> List Pattern -> Maybe Typ
+typecheckPatterns typeEnvArg pats =
+    let
+        getConstructorInfo : String -> List ( String, String, Typ ) -> Maybe ( String, Typ )
+        getConstructorInfo cName typeEnv =
+            case typeEnv of
+                [] ->
+                    Nothing
+
+                ( constructorName, datatypeName, argumentType ) :: typeEnv_ ->
+                    if cName == constructorName then
+                        Just ( datatypeName, argumentType )
+
+                    else
+                        getConstructorInfo cName typeEnv_
+
+        getCommonType : Typ -> Typ -> Maybe Typ
+        getCommonType t1 t2 =
+            case ( t1, t2 ) of
+                ( Anything, _ ) ->
+                    Just Anything
+
+                ( _, Anything ) ->
+                    Just Anything
+
+                ( UnitT, UnitT ) ->
+                    Just UnitT
+
+                ( IntT, IntT ) ->
+                    Just IntT
+
+                ( TupleT ts1, TupleT ts2 ) ->
+                    if List.length ts1 == List.length ts2 then
+                        case allAnswers (\( typ1, typ2 ) -> getCommonType typ1 typ2 |> Maybe.map (\t -> [ t ])) (List.map2 Tuple.pair ts1 ts2) of
+                            Just ts ->
+                                Just (TupleT ts)
+
+                            _ ->
+                                Nothing
+
+                    else
+                        Nothing
+
+                ( Datatype d1, Datatype d2 ) ->
+                    if d1 == d2 then
+                        Just (Datatype d1)
+
+                    else
+                        Nothing
+
+                _ ->
+                    Nothing
+
+        getTyp : Pattern -> Maybe Typ
+        getTyp p =
+            case p of
+                Wildcard ->
+                    Just Anything
+
+                Variable _ ->
+                    Just Anything
+
+                UnitP ->
+                    Just UnitT
+
+                ConstP _ ->
+                    Just IntT
+
+                TupleP ps ->
+                    case allAnswers (\pat -> getTyp pat |> Maybe.map (\t -> [ t ])) ps of
+                        Just ts ->
+                            Just (TupleT ts)
+
+                        _ ->
+                            Nothing
+
+                ConstructorP ( cName, pat ) ->
+                    case ( getConstructorInfo cName typeEnvArg, getTyp pat ) of
+                        ( Just ( datatypeName, argumentType ), Just patTyp ) ->
+                            case getCommonType argumentType patTyp of
+                                Just _ ->
+                                    Just (Datatype datatypeName)
+
+                                _ ->
+                                    Nothing
+
+                        _ ->
+                            Nothing
+    in
+    case allAnswers (\p -> getTyp p |> Maybe.map (\t -> [ t ])) pats of
+        Just (t :: ts) ->
+            List.foldl
+                (\nextType accMaybeTyp ->
+                    case accMaybeTyp of
+                        Just accType ->
+                            getCommonType accType nextType
+
+                        _ ->
+                            Nothing
+                )
+                (Just t)
+                ts
+
+        _ ->
+            Nothing
