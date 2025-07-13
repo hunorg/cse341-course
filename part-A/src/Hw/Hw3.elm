@@ -393,7 +393,7 @@ typecheckPatterns typeEnvArg psArg =
         Just (t :: ts) ->
             List.foldl
                 (\nextTyp accMaybeTyp ->
-                    Maybe.andThen (\accType -> getCommonType accType nextTyp) accMaybeTyp
+                    Maybe.andThen (\accTyp -> getCommonType accTyp nextTyp) accMaybeTyp
                 )
                 (Just t)
                 ts
