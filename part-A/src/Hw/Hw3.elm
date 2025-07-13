@@ -392,10 +392,10 @@ typecheckPatterns typeEnvArg psArg =
     case allAnswers (\p -> getTyp p |> Maybe.map (\t -> [ t ])) psArg of
         Just (t :: ts) ->
             List.foldl
-                (\nextType accMaybeTyp ->
+                (\nextTyp accMaybeTyp ->
                     case accMaybeTyp of
                         Just accType ->
-                            getCommonType accType nextType
+                            getCommonType accType nextTyp
 
                         _ ->
                             Nothing
