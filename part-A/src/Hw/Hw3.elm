@@ -301,7 +301,7 @@ type Typ
 
 
 typecheckPatterns : List ( String, String, Typ ) -> List Pattern -> Maybe Typ
-typecheckPatterns typeEnvArg pats =
+typecheckPatterns typeEnvArg psArg =
     let
         getConstructorInfo : String -> List ( String, String, Typ ) -> Maybe ( String, Typ )
         getConstructorInfo cName typeEnv =
@@ -389,7 +389,7 @@ typecheckPatterns typeEnvArg pats =
                         _ ->
                             Nothing
     in
-    case allAnswers (\p -> getTyp p |> Maybe.map (\t -> [ t ])) pats of
+    case allAnswers (\p -> getTyp p |> Maybe.map (\t -> [ t ])) psArg of
         Just (t :: ts) ->
             List.foldl
                 (\nextType accMaybeTyp ->
