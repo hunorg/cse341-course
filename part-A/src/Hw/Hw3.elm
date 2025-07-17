@@ -301,7 +301,7 @@ type Typ
 
 
 typecheckPatterns : List ( String, String, Typ ) -> List Pattern -> Maybe Typ
-typecheckPatterns typeEnvArg psArg =
+typecheckPatterns typEnvArg psArg =
     let
         getConstructorInfo : String -> List ( String, String, Typ ) -> Maybe ( String, Typ )
         getConstructorInfo cName typeEnv =
@@ -377,7 +377,7 @@ typecheckPatterns typeEnvArg psArg =
                             Nothing
 
                 ConstructorP ( cName, pat ) ->
-                    case ( getConstructorInfo cName typeEnvArg, getTyp pat ) of
+                    case ( getConstructorInfo cName typEnvArg, getTyp pat ) of
                         ( Just ( datatypeName, argumentType ), Just patTyp ) ->
                             case getCommonType argumentType patTyp of
                                 Just _ ->
