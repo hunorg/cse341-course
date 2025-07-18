@@ -21,6 +21,6 @@
               (+ (sum2 (car xs)) (sum2 (cdr xs)))
               (sum2 (cdr xs))))))
 
-; will not work with sum1 but sum2 
+; will not work with sum1 but sum2
 (define test-list
   (list (list "hi" (list 4)) 5 (list 7 2)))

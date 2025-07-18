@@ -1,11 +1,11 @@
 #lang racket
 
 ; list processing: null, cons, null?, car, cdr
-; we won't use pattern matching in Racket 
+; we won't use pattern matching in Racket
 
 (provide (all-defined-out))
 
-; sum all the numbers in a list 
+; sum all the numbers in a list
 (define (sum xs)
   (if (null? xs)
       0

@@ -5,11 +5,11 @@
 ; cons cells are immutable
 
 ; what if youw anted to mutate the contents of a cons cell?
-    ; in racket, you cannot (major change from Scheme)
-    ; this is good 
-        ; list-aliasing irrevelant 
-        ; implementation can make list? fast since listness is
-        ; determined when cons cell is created 
+; in racket, you cannot (major change from Scheme)
+; this is good
+; list-aliasing irrevelant
+; implementation can make list? fast since listness is
+; determined when cons cell is created
 
 (define x (cons 14 null))
 (define y x)
@@ -28,18 +28,18 @@
 (set-mcdr! (mcdr mpr) 14)
 
 (define length-test (length (cons 2 (cons 3 null))))
-; (define length-test2 (length (mcons 2 (mcons 3 null)))) - doesn't work  
+; (define length-test2 (length (mcons 2 (mcons 3 null)))) - doesn't work
 
 ; since mutable pairs are sometimes useful (will use them soon),
 ; Racket provides them too:
-    ; mcons
-    ; mcar 
-    ; mcdr 
-    ; mpair?
-    ; set-mcar!
-    ; set-mcdr!
+; mcons
+; mcar
+; mcdr
+; mpair?
+; set-mcar!
+; set-mcdr!
 
-; run-time error to use mcar on a cons cell or car on an mcons cell 
+; run-time error to use mcar on a cons cell or car on an mcons cell
 
 
 
